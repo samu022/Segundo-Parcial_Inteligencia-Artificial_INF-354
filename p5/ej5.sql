@@ -1,4 +1,5 @@
 
+
 CREATE PROCEDURE CompararPalabras
     @palabra1 varchar(20),
     @palabra2 varchar(20)
@@ -13,7 +14,9 @@ BEGIN
             @sql nvarchar(2000),
             @columna varchar(4),
             @contar int,
-			@resultado int
+			@resultado int,
+			@exactitud1 float,
+			@exactitud2 float
 	
     SET @longitud1 = LEN(@palabra1)
     SET @longitud2 = LEN(@palabra2)
@@ -92,11 +95,20 @@ BEGIN
 	END
     
 	CREATE TABLE resultado (
-		Descripción VARCHAR(255),
+		DescripciÃ³n VARCHAR(255),
 		Resultado VARCHAR(255)
 	);
 	DECLARE @resul VARCHAR(255);
 	SET @resul = CONVERT(VARCHAR(255), @resultado);
+	--exactitud
+	SET @exactitud1 = (CAST(@resultado AS FLOAT) / @longitud1 ) * 100;
+	DECLARE @exac1 VARCHAR(255);
+	SET @exac1 = CONVERT(VARCHAR(255), @exactitud1);
+
+	SET @exactitud2 = (CAST(@resultado AS FLOAT) / @longitud2) *100; -- Cast @resultado to FLOAT
+	
+	DECLARE @exac2 VARCHAR(255);
+	SET @exac2 = CONVERT(VARCHAR(255), @exactitud2);
 	--Insertamos los valoress en la tabla resultado
 	Insert into resultado values ('# de caracteres coincidentes: ', @resul);
 	IF @resultado = @longitud1 AND @resultado = @longitud2
@@ -107,6 +119,8 @@ BEGIN
 	BEGIN
 		Insert into resultado values ('Resultado: ', 'Las cadenas NO son iguales');
 	END
+	Insert into resultado values ('Exactitud cadena 1(%): ', @exac1);
+	Insert into resultado values ('Exactitud cadena 2(%): ', @exac2);
 	Select * from resultado;
 
 END
